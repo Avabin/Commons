@@ -21,7 +21,13 @@ jobs:
       - name: Build
         run: dotnet build --no-restore
       - name: Test
-        run: dotnet test --no-build --verbosity normal
+        run: dotnet test --no-build --logger "trx;LogFileName=test-results.trx"
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: |
+            TestResults/*.trx
       - name: Pack
         run: dotnet pack --output ./nupkg
       - name: Publish NuGet package
