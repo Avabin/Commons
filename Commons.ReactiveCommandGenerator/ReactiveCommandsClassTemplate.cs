@@ -13,11 +13,11 @@ public static class ReactiveCommandsClassTemplate
     /// <param name="className">Class name. MUST be fully qualified type name</param>
     /// <param name="methods">Methods to render as reactive commands. MUST have the method signature with fully qualified type names</param>
     /// <returns></returns>
-    public static string RenderForClass(string @namespace, string className, IEnumerable<string> methods)
+    public static string RenderForClass(string @namespace, string className, IEnumerable<(string method, string canExecute)> methods)
     {
         // render the reactive commands
         var sb = new StringBuilder();
-        foreach (var method in methods)
+        foreach (var (method, canExecuteMethod) in methods)
         {
             // split the method signature
             var indexOfBracket = method.IndexOf('(');
@@ -25,7 +25,6 @@ public static class ReactiveCommandsClassTemplate
             var methodSignature = method[..indexOfBracket].Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             var indexOfEndBracket = method.IndexOf(')');
             var parameter = method[(indexOfBracket + 1)..indexOfEndBracket].Trim();
-            var hasParameter = !string.IsNullOrWhiteSpace(parameter);
 
             // split method name to get the parameter and base name
             var methodName = methodSignature[^1];
@@ -41,7 +40,8 @@ public static class ReactiveCommandsClassTemplate
             }
 
             // get the reactive command
-            var reactiveCommand = ReactiveCommandTemplate.RenderReactiveCommand(baseMethodName, returnType, parameter);
+            var reactiveCommand =
+                ReactiveCommandTemplate.RenderReactiveCommand(baseMethodName, returnType, parameter, canExecuteMethod);
 
             // append the reactive command
             sb.AppendLine(reactiveCommand);

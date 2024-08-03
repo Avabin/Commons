@@ -15,16 +15,16 @@ public class ReactiveCommandGenerator : ISourceGenerator
     public void Initialize(GeneratorInitializationContext context)
     {
         // wait for debugger
-        if (!Debugger.IsAttached)
-        {
-            Debugger.Launch();
-        }
+        // if (!Debugger.IsAttached)
+        // {
+        //     Debugger.Launch();
+        // }
     }
 
     public void Execute(GeneratorExecutionContext context)
     {
         var syntaxTrees = context.Compilation.SyntaxTrees;
-        var classesWithAttribute = new List<(string Namespace, string ClassName, List<string> Methods)>();
+        var classesWithAttribute = new List<(string Namespace, string ClassName, List<(string, string)> Methods)>();
 
         foreach (var syntaxTree in syntaxTrees)
         {
@@ -47,7 +47,8 @@ public class ReactiveCommandGenerator : ISourceGenerator
                     })
                     .Where(@t => @t.attributes.Any(attr =>
                         semanticModel.GetTypeInfo(attr).Type?.Name == "ReactiveCommandAttribute"))
-                    .Select(@t => FormatMethodDeclaration(@t.method, semanticModel))).ToList();
+                    .Select(@t => (method: FormatMethodDeclaration(@t.method, semanticModel), canExecute: GetCanExecuteMethodNameFromMethodDeclaration(@t.method, semanticModel))))
+                    .ToList();
 
                 if (methodsWithAttribute.Any())
                 {
@@ -62,6 +63,23 @@ public class ReactiveCommandGenerator : ISourceGenerator
             var sourceText = SourceText.From(generatedCode, Encoding.UTF8);
             context.AddSource($"{className}.ReactiveCommands.g.cs", sourceText);
         }
+    }
+
+    private static string GetCanExecuteMethodNameFromMethodDeclaration(MethodDeclarationSyntax method, SemanticModel semanticModel)
+    {
+        // Get the attributes of the method
+        var attributes = method.AttributeLists.SelectMany(al => al.Attributes);
+
+        // Find the ReactiveCommandAttribute
+        var reactiveCommandAttribute = attributes.FirstOrDefault(attr =>
+            semanticModel.GetTypeInfo(attr).Type?.Name == "ReactiveCommandAttribute");
+
+        // Get the CanExecuteMethodName argument
+        var canExecuteArgument = reactiveCommandAttribute?.ArgumentList?.Arguments.FirstOrDefault();
+        if (canExecuteArgument == null) return string.Empty;
+        // Get the value of the CanExecuteMethodName argument
+        var constantValue = semanticModel.GetConstantValue(canExecuteArgument.Expression);
+        return constantValue is { HasValue: true, Value: string canExecuteMethodName } ? canExecuteMethodName : string.Empty;
     }
     
     private static string FormatMethodDeclaration(MethodDeclarationSyntax method, SemanticModel semanticModel)

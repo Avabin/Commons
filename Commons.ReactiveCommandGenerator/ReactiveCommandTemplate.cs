@@ -10,8 +10,9 @@ public static class ReactiveCommandTemplate
     /// <param name="methodName">The name of the method</param>
     /// <param name="returnType">The return type of the method. MUST be a fully qualified type name</param>
     /// <param name="parameter">The parameter of the method. MUST be a fully qualified type name</param>
+    /// <param name="canExecuteMethod">The name of the method that determines if the command can execute. Must returns a boolean</param>
     /// <returns></returns>
-    public static string RenderReactiveCommand(string methodName, string returnType = "", string parameter = "")
+    public static string RenderReactiveCommand(string methodName, string returnType = "", string parameter = "", string canExecuteMethod = "")
     {
         /*
          * Example
@@ -120,7 +121,7 @@ public static class ReactiveCommandTemplate
         }
         else if (isObservable)
         {
-            transformReturnType = returnType[returnType.IndexOf('<')..^1];
+            transformReturnType = returnType[(returnType.IndexOf('<') +1)..^1];
         }
         else
         {
@@ -132,42 +133,78 @@ public static class ReactiveCommandTemplate
 
         // but first, if method is async, we need to remove the *Async suffix if it exists
         var commandMethodName = methodName.EndsWith("Async") ? methodName[..^5] : methodName;
+        
+        var hasCanExecuteMethod = !string.IsNullOrWhiteSpace(canExecuteMethod);
 
-        return (isTask, isObservable, methodHasParameter, methodHasReturnType) switch
+        return (isTask, isObservable, methodHasParameter, methodHasReturnType, hasCanExecuteMethod) switch
         {
             // void DoSomething()
-            (false, false, false, false) =>
+            (false, false, false, false, false) =>
                 $"public global::ReactiveUI.ReactiveCommand<global::System.Reactive.Unit, global::System.Reactive.Unit> {commandMethodName}Command => global::ReactiveUI.ReactiveCommand.Create({methodName});",
             // void DoSomethingWithParameter(int parameter)
-            (false, false, true, false) =>
+            (false, false, true, false, false) =>
                 $"public global::ReactiveUI.ReactiveCommand<{parameterType}, global::System.Reactive.Unit> {commandMethodName}Command => global::ReactiveUI.ReactiveCommand.Create<{parameterType}>({methodName});",
             // async Task DoSomethingAsync()
-            (true, false, false, false) =>
+            (true, false, false, false, false) =>
                 $"public global::ReactiveUI.ReactiveCommand<global::System.Reactive.Unit, global::System.Reactive.Unit> {commandMethodName}Command => global::ReactiveUI.ReactiveCommand.CreateFromTask({methodName});",
             // async Task DoSomethingWithParameterAsync(int parameter)
-            (true, false, true, false) =>
+            (true, false, true, false, false) =>
                 $"public global::ReactiveUI.ReactiveCommand<{parameterType}, global::System.Reactive.Unit> {commandMethodName}Command => global::ReactiveUI.ReactiveCommand.CreateFromTask<{parameterType}>({methodName});",
             // Entry DoSomethingAndReturn()
-            (false, false, false, true) =>
+            (false, false, false, true, false) =>
                 $"public global::ReactiveUI.ReactiveCommand<global::System.Reactive.Unit, {transformReturnType}> {commandMethodName}Command => global::ReactiveUI.ReactiveCommand.Create<{transformReturnType}>({methodName});",
             // async Task<Entry> DoSomethingAndReturnAsync()
-            (true, false, false, true) =>
+            (true, false, false, true, false) =>
                 $"public global::ReactiveUI.ReactiveCommand<global::System.Reactive.Unit, {transformReturnType}> {commandMethodName}Command => global::ReactiveUI.ReactiveCommand.CreateFromTask<{transformReturnType}>({methodName});",
             // Entry DoSomethingWithParameterAndReturn(int parameter)
-            (false, false, true, true) =>
+            (false, false, true, true, false) =>
                 $"public global::ReactiveUI.ReactiveCommand<{parameterType}, {transformReturnType}> {commandMethodName}Command => global::ReactiveUI.ReactiveCommand.Create<{parameterType}, {transformReturnType}>({methodName});",
             // async Task<Entry> DoSomethingWithParameterAndReturnAsync(int parameter)
-            (true, false, true, true) =>
+            (true, false, true, true, false) =>
                 $"public global::ReactiveUI.ReactiveCommand<{parameterType}, {transformReturnType}> {commandMethodName}Command => global::ReactiveUI.ReactiveCommand.CreateFromTask<{parameterType}, {transformReturnType}>({methodName});",
             // IObservable<Entry> DoSomethingAndReturnObservable()
-            (false, true, false, true) =>
+            (false, true, false, true, false) =>
                 $"public global::ReactiveUI.ReactiveCommand<global::System.Reactive.Unit, global::System.IObservable<{transformReturnType}>> {commandMethodName}Command => global::ReactiveUI.ReactiveCommand.CreateFromObservable<{transformReturnType}>({methodName});",
             // IObservable<Entry> DoSomethingWithParameterAndReturnObservable(int parameter)
-            (false, true, true, true) =>
+            (false, true, true, true, false) =>
                 $"public global::ReactiveUI.ReactiveCommand<{parameterType}, global::System.IObservable<{transformReturnType}>> {commandMethodName}Command => global::ReactiveUI.ReactiveCommand.CreateFromObservable<{parameterType}, {transformReturnType}>({methodName});",
             // IObservable<Unit> DoSomethingObservable()
-            (false, true, false, false) =>
+            (false, true, false, false, false) =>
                 $"public global::ReactiveUI.ReactiveCommand<global::System.Reactive.Unit, global::System.Reactive.Unit> {commandMethodName}Command => global::ReactiveUI.ReactiveCommand.CreateFromObservable({methodName});",
+            // void DoSomething() with can execute
+            (false, false, false, false, true) =>
+                $"public global::ReactiveUI.ReactiveCommand<global::System.Reactive.Unit, global::System.Reactive.Unit> {commandMethodName}Command => global::ReactiveUI.ReactiveCommand.Create({methodName}, {canExecuteMethod}());",
+            // void DoSomethingWithParameter(int parameter) with can execute
+            (false, false, true, false, true) =>
+                $"public global::ReactiveUI.ReactiveCommand<{parameterType}, global::System.Reactive.Unit> {commandMethodName}Command => global::ReactiveUI.ReactiveCommand.Create<{parameterType}>({methodName}, {canExecuteMethod}());",
+            // async Task DoSomethingAsync() with can execute
+            (true, false, false, false, true) =>
+                $"public global::ReactiveUI.ReactiveCommand<global::System.Reactive.Unit, global::System.Reactive.Unit> {commandMethodName}Command => global::ReactiveUI.ReactiveCommand.CreateFromTask({methodName}, {canExecuteMethod}());",
+            // async Task DoSomethingWithParameterAsync(int parameter) with can execute
+            (true, false, true, false, true) =>
+                $"public global::ReactiveUI.ReactiveCommand<{parameterType}, global::System.Reactive.Unit> {commandMethodName}Command => global::ReactiveUI.ReactiveCommand.CreateFromTask<{parameterType}>({methodName}, {canExecuteMethod}());",
+            // Entry DoSomethingAndReturn() with can execute
+            (false, false, false, true, true) =>
+                $"public global::ReactiveUI.ReactiveCommand<global::System.Reactive.Unit, {transformReturnType}> {commandMethodName}Command => global::ReactiveUI.ReactiveCommand.Create<{transformReturnType}>({methodName}, {canExecuteMethod}());",
+            // async Task<Entry> DoSomethingAndReturnAsync() with can execute
+            (true, false, false, true, true) =>
+                $"public global::ReactiveUI.ReactiveCommand<global::System.Reactive.Unit, {transformReturnType}> {commandMethodName}Command => global::ReactiveUI.ReactiveCommand.CreateFromTask<{transformReturnType}>({methodName}, {canExecuteMethod}());",
+            // Entry DoSomethingWithParameterAndReturn(int parameter) with can execute
+            (false, false, true, true, true) =>
+                $"public global::ReactiveUI.ReactiveCommand<{parameterType}, {transformReturnType}> {commandMethodName}Command => global::ReactiveUI.ReactiveCommand.Create<{parameterType}, {transformReturnType}>({methodName}, {canExecuteMethod}());",
+            // async Task<Entry> DoSomethingWithParameterAndReturnAsync(int parameter) with can execute
+            (true, false, true, true, true) =>
+                $"public global::ReactiveUI.ReactiveCommand<{parameterType}, {transformReturnType}> {commandMethodName}Command => global::ReactiveUI.ReactiveCommand.CreateFromTask<{parameterType}, {transformReturnType}>({methodName}, {canExecuteMethod}());",
+            // IObservable<Entry> DoSomethingAndReturnObservable() with can execute
+            (false, true, false, true, true) =>
+                $"public global::ReactiveUI.ReactiveCommand<global::System.Reactive.Unit, global::System.IObservable<{transformReturnType}>> {commandMethodName}Command => global::ReactiveUI.ReactiveCommand.CreateFromObservable<{transformReturnType}>({methodName}, {canExecuteMethod}());",
+            // IObservable<Entry> DoSomethingWithParameterAndReturnObservable(int parameter) with can execute
+            (false, true, true, true, true) =>
+                $"public global::ReactiveUI.ReactiveCommand<{parameterType}, {transformReturnType}> {commandMethodName}Command => global::ReactiveUI.ReactiveCommand.CreateFromObservable<{parameterType}, {transformReturnType}>({methodName}, {canExecuteMethod}());",
+            // IObservable<Unit> DoSomethingObservable() with can execute
+            (false, true, false, false, true) =>
+                $"public global::ReactiveUI.ReactiveCommand<global::System.Reactive.Unit, global::System.Reactive.Unit> {commandMethodName}Command => global::ReactiveUI.ReactiveCommand.CreateFromObservable({methodName}, {canExecuteMethod}());",
+            // default
             _ => string.Empty
         };
     }
