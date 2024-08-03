@@ -6,8 +6,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commons.ReactiveCommandGene
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commons.ReactiveCommandGenerator.Core", "Commons.ReactiveCommandGenerator.Core\Commons.ReactiveCommandGenerator.Core.csproj", "{17228F59-7650-47B4-9699-384B373838E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataTests", "DataTests\DataTests.csproj", "{765D82F0-613C-4201-84C8-C93B6ED87BF4}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,9 +24,5 @@ Global
 		{17228F59-7650-47B4-9699-384B373838E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17228F59-7650-47B4-9699-384B373838E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{17228F59-7650-47B4-9699-384B373838E7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{765D82F0-613C-4201-84C8-C93B6ED87BF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{765D82F0-613C-4201-84C8-C93B6ED87BF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{765D82F0-613C-4201-84C8-C93B6ED87BF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{765D82F0-613C-4201-84C8-C93B6ED87BF4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
