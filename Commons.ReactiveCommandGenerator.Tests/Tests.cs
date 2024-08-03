@@ -678,5 +678,133 @@ public class Tests
         var expectedReplaced = expected.Replace(" ", "").Replace("\n", "").Replace("\r", "");
         resultReplaced.Should().Be(expectedReplaced, $"Expected: \r\n{expected}, \r\nbut got: \r\n{result}");
     }
+    
+    // async Task DoSomethingAsync(CancellationToken token)
+    [Test]
+    public void Method_AsyncWithCancellation()
+    {
+        // Arrange
+        var @namespace = "Some.Module";
+        var className = "SomeClass";
+        var methods = new List<(string methodName, string canExecuteMethodName)>
+        {
+            ("async global::System.Threading.Tasks.Task DoSomethingAsync(global::System.Threading.CancellationToken token)", "")
+        };
+
+        // Act
+        var result = ReactiveCommandsClassTemplate.RenderForClass(@namespace, className, methods);
+
+        // Assert
+        var expected = """
+                       namespace Some.Module;
+                       public partial class SomeClass
+                       {
+                       
+                       public global::ReactiveUI.ReactiveCommand<global::System.Reactive.Unit, global::System.Reactive.Unit> DoSomethingCommand => global::ReactiveUI.ReactiveCommand.CreateFromTask(DoSomethingAsync);
+                       
+                       }
+                       """;
+
+        // remove all whitespaces
+        var resultReplaced = result.Replace(" ", "").Replace("\n", "").Replace("\r", "");
+        var expectedReplaced = expected.Replace(" ", "").Replace("\n", "").Replace("\r", "");
+        resultReplaced.Should().Be(expectedReplaced, $"Expected: \r\n{expected}, \r\nbut got: \r\n{result}");
+    }
+    
+    // async Task DoSomethingWithParameterAsync(int parameter, CancellationToken token)
+    [Test]
+    public void Method_AsyncWithParamAndCancellation()
+    {
+        // Arrange
+        var @namespace = "Some.Module";
+        var className = "SomeClass";
+        var methods = new List<(string methodName, string canExecuteMethodName)>
+        {
+            ("async global::System.Threading.Tasks.Task DoSomethingWithParameterAsync(int parameter, global::System.Threading.CancellationToken token)", "")
+        };
+
+        // Act
+        var result = ReactiveCommandsClassTemplate.RenderForClass(@namespace, className, methods);
+
+        // Assert
+        var expected = """
+                       namespace Some.Module;
+                       public partial class SomeClass
+                       {
+                       
+                       public global::ReactiveUI.ReactiveCommand<int, global::System.Reactive.Unit> DoSomethingWithParameterCommand => global::ReactiveUI.ReactiveCommand.CreateFromTask<int>(DoSomethingWithParameterAsync);
+                       
+                       }
+                       """;
+
+        // remove all whitespaces
+        var resultReplaced = result.Replace(" ", "").Replace("\n", "").Replace("\r", "");
+        var expectedReplaced = expected.Replace(" ", "").Replace("\n", "").Replace("\r", "");
+        resultReplaced.Should().Be(expectedReplaced, $"Expected: \r\n{expected}, \r\nbut got: \r\n{result}");
+    }
+    
+    // async Task<int> DoSomethingAndReturnAsync(CancellationToken token)
+    [Test]
+    public void Method_AsyncWithCancellationAndReturn()
+    {
+        // Arrange
+        var @namespace = "Some.Module";
+        var className = "SomeClass";
+        var methods = new List<(string methodName, string canExecuteMethodName)>
+        {
+            ("async global::System.Threading.Tasks.Task<int> DoSomethingAndReturnAsync(global::System.Threading.CancellationToken token)", "")
+        };
+
+        // Act
+        var result = ReactiveCommandsClassTemplate.RenderForClass(@namespace, className, methods);
+
+        // Assert
+        var expected = """
+                       namespace Some.Module;
+                       public partial class SomeClass
+                       {
+                       
+                       public global::ReactiveUI.ReactiveCommand<global::System.Reactive.Unit, int> DoSomethingAndReturnCommand => global::ReactiveUI.ReactiveCommand.CreateFromTask<int>(DoSomethingAndReturnAsync);
+                       
+                       }
+                       """;
+
+        // remove all whitespaces
+        var resultReplaced = result.Replace(" ", "").Replace("\n", "").Replace("\r", "");
+        var expectedReplaced = expected.Replace(" ", "").Replace("\n", "").Replace("\r", "");
+        resultReplaced.Should().Be(expectedReplaced, $"Expected: \r\n{expected}, \r\nbut got: \r\n{result}");
+    }
+    
+    // async Task<int> DoSomethingWithParameterAndReturnAsync(int parameter, CancellationToken token)
+    [Test]
+    public void Method_AsyncWithParamCancellationAndReturn()
+    {
+        // Arrange
+        var @namespace = "Some.Module";
+        var className = "SomeClass";
+        var methods = new List<(string methodName, string canExecuteMethodName)>
+        {
+            ("async global::System.Threading.Tasks.Task<int> DoSomethingWithParameterAndReturnAsync(int parameter, global::System.Threading.CancellationToken token)", "")
+        };
+
+        // Act
+        var result = ReactiveCommandsClassTemplate.RenderForClass(@namespace, className, methods);
+
+        // Assert
+        var expected = """
+                       namespace Some.Module;
+                       public partial class SomeClass
+                       {
+                       
+                       public global::ReactiveUI.ReactiveCommand<int, int> DoSomethingWithParameterAndReturnCommand => global::ReactiveUI.ReactiveCommand.CreateFromTask<int, int>(DoSomethingWithParameterAndReturnAsync);
+                       
+                       }
+                       """;
+
+        // remove all whitespaces
+        var resultReplaced = result.Replace(" ", "").Replace("\n", "").Replace("\r", "");
+        var expectedReplaced = expected.Replace(" ", "").Replace("\n", "").Replace("\r", "");
+        resultReplaced.Should().Be(expectedReplaced, $"Expected: \r\n{expected}, \r\nbut got: \r\n{result}");
+    }
 
 }

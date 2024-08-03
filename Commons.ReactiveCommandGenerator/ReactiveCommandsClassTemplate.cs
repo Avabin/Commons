@@ -24,13 +24,12 @@ public static class ReactiveCommandsClassTemplate
             // split only until the method bracket
             var methodSignature = method[..indexOfBracket].Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             var indexOfEndBracket = method.IndexOf(')');
-            var parameter = method[(indexOfBracket + 1)..indexOfEndBracket].Trim();
+            var parameters = method[(indexOfBracket + 1)..indexOfEndBracket].Trim();
+            var hasParameter = !string.IsNullOrWhiteSpace(parameters);
+            var splitParameters = parameters.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
             // split method name to get the parameter and base name
             var methodName = methodSignature[^1];
-            var methodNameParts =
-                methodName.Split('(', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-            var baseMethodName = methodNameParts[0];
 
             // get the return type
             var returnType = methodSignature[^2];
@@ -41,7 +40,7 @@ public static class ReactiveCommandsClassTemplate
 
             // get the reactive command
             var reactiveCommand =
-                ReactiveCommandTemplate.RenderReactiveCommand(baseMethodName, returnType, parameter, canExecuteMethod);
+                ReactiveCommandTemplate.RenderReactiveCommand(methodName, returnType, splitParameters, canExecuteMethod);
 
             // append the reactive command
             sb.AppendLine(reactiveCommand);

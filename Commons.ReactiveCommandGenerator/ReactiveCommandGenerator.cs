@@ -35,6 +35,7 @@ public class ReactiveCommandGenerator : ISourceGenerator
 
             foreach (var classDeclaration in classDeclarations)
             {
+                if(classDeclaration is null) continue;
                 var namespaceName = GetNamespace(classDeclaration);
                 var className = classDeclaration.Identifier.Text;
 
@@ -50,7 +51,7 @@ public class ReactiveCommandGenerator : ISourceGenerator
                     .Select(@t => (method: FormatMethodDeclaration(@t.method, semanticModel), canExecute: GetCanExecuteMethodNameFromMethodDeclaration(@t.method, semanticModel))))
                     .ToList();
 
-                if (methodsWithAttribute.Any())
+                if (methodsWithAttribute.Count != 0)
                 {
                     classesWithAttribute.Add((namespaceName, className, methodsWithAttribute));
                 }
@@ -95,7 +96,7 @@ public class ReactiveCommandGenerator : ISourceGenerator
         var parameters = string.Join(", ", method.ParameterList.Parameters.Select(p =>
         {
             var parameterTypeSymbol = semanticModel.GetSymbolInfo(p.Type!).Symbol as ITypeSymbol;
-            var fullyQualifiedParameterType = parameterTypeSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? p.Type.ToString();
+            var fullyQualifiedParameterType = parameterTypeSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? p.Type?.ToString() ?? "";
             return $"{fullyQualifiedParameterType} {p.Identifier.Text}";
         }));
 
