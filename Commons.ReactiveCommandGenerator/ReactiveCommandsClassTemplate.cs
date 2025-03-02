@@ -13,7 +13,7 @@ public static class ReactiveCommandsClassTemplate
     /// <param name="className">Class name. MUST be fully qualified type name</param>
     /// <param name="methods">Methods to render as reactive commands. MUST have the method signature with fully qualified type names</param>
     /// <returns></returns>
-    public static string RenderForClass(string @namespace, string className, IEnumerable<(string method, string canExecute)> methods)
+    public static string RenderForClass(string @namespace, string className, IEnumerable<(string method, string canExecute)> methods, string accessModifier = "public")
     {
         // render the reactive commands
         var sb = new StringBuilder();
@@ -48,6 +48,7 @@ public static class ReactiveCommandsClassTemplate
 
         // render the class
         var renderedClass = ReactiveCommandClassTemplate
+            .Replace("{AccessModifier}", accessModifier)
             .Replace("{Namespace}", @namespace)
             .Replace("{ClassName}", className)
             .Replace("{Properties}", sb.ToString());
@@ -58,7 +59,7 @@ public static class ReactiveCommandsClassTemplate
     private const string ReactiveCommandClassTemplate = """
                                                         namespace {Namespace};
                                                                                                                  
-                                                        public partial class {ClassName}
+                                                        {AccessModifier} partial class {ClassName}
                                                         {
 
                                                         {Properties}

@@ -8,10 +8,16 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
 namespace Commons.ReactiveCommandGenerator;
-
+/// <summary>
+/// A source generator that generates a class with reactive commands based on methods decorated with the ReactiveCommandAttribute.
+/// </summary>
 [Generator]
 public class ReactiveCommandGenerator : ISourceGenerator
 {
+    /// <summary>
+    /// Initializes the source generator. Waits for debugger if it is not attached.
+    /// </summary>
+    /// <param name="context">The context of the source generation.</param>
     public void Initialize(GeneratorInitializationContext context)
     {
         // wait for debugger
@@ -21,10 +27,14 @@ public class ReactiveCommandGenerator : ISourceGenerator
         // }
     }
 
+    /// <summary>
+    /// Executes the source generator. Generates a class with reactive commands based on methods decorated with the ReactiveCommandAttribute.
+    /// </summary>
+    /// <param name="context">The context of the source generation.</param>
     public void Execute(GeneratorExecutionContext context)
     {
         var syntaxTrees = context.Compilation.SyntaxTrees;
-        var classesWithAttribute = new List<(string Namespace, string ClassName, List<(string, string)> Methods)>();
+        var classesWithAttribute = new List<(string namespaceName, string className, List<(string method, string canExecute)> methodsWithAttribute, string accessModifier)>();
 
         foreach (var syntaxTree in syntaxTrees)
         {
@@ -38,6 +48,7 @@ public class ReactiveCommandGenerator : ISourceGenerator
                 if(classDeclaration is null) continue;
                 var namespaceName = GetNamespace(classDeclaration);
                 var className = classDeclaration.Identifier.Text;
+                var accessModifier = classDeclaration.Modifiers.FirstOrDefault().Text ?? "public";
 
                 var methodsWithAttribute = (classDeclaration.Members.OfType<MethodDeclarationSyntax>()
                     .Select(method => new
@@ -53,14 +64,14 @@ public class ReactiveCommandGenerator : ISourceGenerator
 
                 if (methodsWithAttribute.Count != 0)
                 {
-                    classesWithAttribute.Add((namespaceName, className, methodsWithAttribute));
+                    classesWithAttribute.Add((namespaceName, className, methodsWithAttribute, accessModifier));
                 }
             }
         }
 
-        foreach (var (@namespace, className, methods) in classesWithAttribute)
+        foreach (var (@namespace, className, methods, accessModifier) in classesWithAttribute)
         {
-            var generatedCode = ReactiveCommandsClassTemplate.RenderForClass(@namespace, className, methods);
+            var generatedCode = ReactiveCommandsClassTemplate.RenderForClass(@namespace, className, methods, accessModifier);
             var sourceText = SourceText.From(generatedCode, Encoding.UTF8);
             context.AddSource($"{className}.ReactiveCommands.g.cs", sourceText);
         }

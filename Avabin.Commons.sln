@@ -6,6 +6,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commons.ReactiveCommandGene
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commons.ReactiveCommandGenerator.Core", "Commons.ReactiveCommandGenerator.Core\Commons.ReactiveCommandGenerator.Core.csproj", "{17228F59-7650-47B4-9699-384B373838E7}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Aspire", "Aspire", "{2C970784-DB7E-4DB8-BBE5-FCD6525C2494}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aspire.Discord.Hosting", "Aspire\Aspire.Discord.Hosting\Aspire.Discord.Hosting.csproj", "{A803820E-417D-4BB5-90E8-9FF33FDFB3CA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aspire.Discord.Client", "Aspire\Aspire.Discord.Client\Aspire.Discord.Client.csproj", "{EDDEB392-F8B0-43D8-A799-1EC733681D01}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +30,17 @@ Global
 		{17228F59-7650-47B4-9699-384B373838E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17228F59-7650-47B4-9699-384B373838E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{17228F59-7650-47B4-9699-384B373838E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A803820E-417D-4BB5-90E8-9FF33FDFB3CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A803820E-417D-4BB5-90E8-9FF33FDFB3CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A803820E-417D-4BB5-90E8-9FF33FDFB3CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A803820E-417D-4BB5-90E8-9FF33FDFB3CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EDDEB392-F8B0-43D8-A799-1EC733681D01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDDEB392-F8B0-43D8-A799-1EC733681D01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDDEB392-F8B0-43D8-A799-1EC733681D01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDDEB392-F8B0-43D8-A799-1EC733681D01}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A803820E-417D-4BB5-90E8-9FF33FDFB3CA} = {2C970784-DB7E-4DB8-BBE5-FCD6525C2494}
+		{EDDEB392-F8B0-43D8-A799-1EC733681D01} = {2C970784-DB7E-4DB8-BBE5-FCD6525C2494}
 	EndGlobalSection
 EndGlobal

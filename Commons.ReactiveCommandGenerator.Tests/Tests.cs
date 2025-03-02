@@ -806,5 +806,40 @@ public class Tests
         var expectedReplaced = expected.Replace(" ", "").Replace("\n", "").Replace("\r", "");
         resultReplaced.Should().Be(expectedReplaced, $"Expected: \r\n{expected}, \r\nbut got: \r\n{result}");
     }
+    
+    // test to test for access modifiers
+    [TestCase("public")]
+    [TestCase("protected")]
+    [TestCase("internal")]
+    [TestCase("private")]
+    public void AccessModifiers(string accessModifier)
+    {
+        // Arrange
+        var @namespace = "Some.Module";
+        var className = "SomeClass";
+        var methods = new List<(string methodName, string canExecuteMethodName)>
+        {
+            ($"private void DoSomething()", "")
+        };
+
+        // Act
+        var result = ReactiveCommandsClassTemplate.RenderForClass(@namespace, className, methods, accessModifier);
+
+        // Assert
+        var expected = $@"
+                       namespace Some.Module;
+                       {accessModifier} partial class SomeClass
+                       {{
+                       
+                       public global::ReactiveUI.ReactiveCommand<global::System.Reactive.Unit, global::System.Reactive.Unit> DoSomethingCommand => global::ReactiveUI.ReactiveCommand.Create(DoSomething);
+                       
+                       }}
+                       ";
+
+        // remove all whitespaces
+        var resultReplaced = result.Replace(" ", "").Replace("\n", "").Replace("\r", "");
+        var expectedReplaced = expected.Replace(" ", "").Replace("\n", "").Replace("\r", "");
+        resultReplaced.Should().Be(expectedReplaced, $"Expected: \r\n{expected}, \r\nbut got: \r\n{result}");
+    }
 
 }
