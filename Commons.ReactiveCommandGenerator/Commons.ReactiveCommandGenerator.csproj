@@ -4,7 +4,6 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-    <Authors>Avabin</Authors>
     <TargetFrameworks>net8.0;net7.0;net9.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
@@ -12,10 +11,7 @@
 <!--  Nuget properties -->
   <PropertyGroup>
     <PackageId>Commons.ReactiveCommandGenerator</PackageId>
-    <Version>1.0.2</Version>
-    <Authors>Avabin</Authors>
     <Description>ReactiveCommand generator</Description>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 

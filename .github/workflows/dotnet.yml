@@ -16,10 +16,37 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 9.0.x
+      
+      # Set up version variables
+      - name: Setup version variables
+        id: version
+        run: |
+          # Get current version from repository variables, default to 1.0.0 if not set
+          CURRENT_VERSION="${{ vars.PACKAGE_VERSION }}"
+          if [ -z "$CURRENT_VERSION" ]; then
+            CURRENT_VERSION="1.0.0"
+          fi
+          echo "Current version: $CURRENT_VERSION"
+          
+          # Parse version and increment patch number for master branch builds
+          if [ "${{ github.ref }}" = "refs/heads/master" ] && [ "${{ github.event_name }}" = "push" ]; then
+            IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
+            NEW_PATCH=$((patch + 1))
+            NEW_VERSION="${major}.${minor}.${NEW_PATCH}"
+            echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
+            echo "INCREMENT_VERSION=true" >> $GITHUB_OUTPUT
+            echo "New version will be: $NEW_VERSION"
+          else
+            echo "NEW_VERSION=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+            echo "INCREMENT_VERSION=false" >> $GITHUB_OUTPUT
+            echo "Using current version: $CURRENT_VERSION"
+          fi
+          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+      
       - name: Restore dependencies
         run: dotnet restore
       - name: Build
-        run: dotnet build --no-restore
+        run: dotnet build --no-restore -p:VersionPrefix=${{ steps.version.outputs.NEW_VERSION }}
       - name: Test
         run: dotnet test --no-build --logger "trx;LogFileName=test-results.trx"
       - name: Publish Test Results
@@ -30,7 +57,21 @@ jobs:
             TestResults/**/*.trx
             **/TestResults/*.trx
       - name: Pack
-        run: dotnet pack --output ./nupkg
+        run: dotnet pack --output ./nupkg --no-build -p:VersionPrefix=${{ steps.version.outputs.NEW_VERSION }}
+      
+      # Update version variable only on successful master builds
+      - name: Update version variable
+        if: steps.version.outputs.INCREMENT_VERSION == 'true' && success()
+        run: |
+          echo "Updating PACKAGE_VERSION to ${{ steps.version.outputs.NEW_VERSION }}"
+          curl -L \
+            -X PATCH \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/${{ github.repository }}/actions/variables/PACKAGE_VERSION \
+            -d '{"name":"PACKAGE_VERSION","value":"${{ steps.version.outputs.NEW_VERSION }}"}'
+      
       - name: Publish NuGet package
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: dotnet nuget push ./nupkg/*.nupkg --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" --api-key ${{ secrets.GITHUB_TOKEN }}

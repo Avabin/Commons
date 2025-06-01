@@ -4,17 +4,13 @@
         <LangVersion>latest</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <Authors>Avabin</Authors>
         <TargetFrameworks>net8.0;netstandard2.1</TargetFrameworks>
     </PropertyGroup>
     
-<!--    nuger properties -->
+<!--    nuget properties -->
     <PropertyGroup>
         <PackageId>Commons.ReactiveCommandGenerator.Core</PackageId>
-        <Version>1.0.1</Version>
-        <Authors>Avabin</Authors>
         <Description>ReactiveCommand generators attributes</Description>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
     <ItemGroup>

@@ -12,11 +12,9 @@
     </ItemGroup>
 
     <PropertyGroup>
-        <Authors>Avabin</Authors>
         <Company>Aspire.Discord.Hosting</Company>
         <Description>Discord generic Aspire client integration</Description>
         <PackageId>Aspire.Discord.Hosting</PackageId>
-        <Version>1.0.0</Version>
         <LicenseUrl>https://opensource.org/licenses/MIT</LicenseUrl>
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
