@@ -15,7 +15,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 9.0.x
       - name: Restore dependencies
         run: dotnet restore
       - name: Build
@@ -27,8 +27,10 @@ jobs:
         if: always()
         with:
           files: |
-            TestResults/*.trx
+            TestResults/**/*.trx
+            **/TestResults/*.trx
       - name: Pack
         run: dotnet pack --output ./nupkg
       - name: Publish NuGet package
-        run: dotnet nuget push ./nupkg/*.nupkg --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" --api-key ${{ secrets.NUPKG_TOKEN }}
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: dotnet nuget push ./nupkg/*.nupkg --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" --api-key ${{ secrets.GITHUB_TOKEN }}
