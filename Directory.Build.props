@@ -1,0 +1,16 @@
+<Project>
+  <PropertyGroup>
+    <!-- Central version management -->
+    <!-- Version will be overridden by GitHub Actions using repository variables -->
+    <VersionPrefix Condition="'$(VersionPrefix)' == ''">1.0.0</VersionPrefix>
+    <VersionSuffix Condition="'$(VersionSuffix)' == ''"></VersionSuffix>
+    
+    <!-- Build the final version -->
+    <Version Condition="'$(VersionSuffix)' == ''">$(VersionPrefix)</Version>
+    <Version Condition="'$(VersionSuffix)' != ''">$(VersionPrefix)-$(VersionSuffix)</Version>
+    
+    <!-- Common properties for all projects -->
+    <Authors>Avabin</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+</Project>
