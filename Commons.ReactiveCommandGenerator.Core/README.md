@@ -32,16 +32,16 @@ public ReactiveCommand<Unit, Unit> MyMethodCommand => ReactiveCommand.Create(MyM
 You can specify a CanExecute method by naming convention:
 
 ```csharp
-[ReactiveCommand]
+[ReactiveCommand(canExecuteMethodName: nameof(CanDoSomethingExecute)]
 private void DoSomething()
 {
     // Command logic
 }
 
-private bool CanDoSomethingExecute()
+private IObservable<bool> CanDoSomethingExecute()
 {
     // Return true if command can execute
-    return true;
+    return Observable.Return(true);
 }
 ```
 
